@@ -67,8 +67,14 @@ object Option {
 
   def map2[A,B,C](oa: Option[A], ob: Option[B])(f: (A, B) => C): Option[C] = oa.flatMap(a => ob.map(b => f(a, b)))
 
+  def map2_with_for_comprehension[A,B,C](oa: Option[A], ob: Option[B])(f: (A, B) => C): Option[C] =
+    for { a <- oa; b <- ob; } yield f(a, b)
+
   def sequence[A](a: List[Option[A]]): Option[List[A]] =
     a.foldLeft[Option[List[A]]](Some(List.empty))((acc, oa) => oa.flatMap(a => acc.map(as => as.::(a))))
+
+  def sequence_with_traverse[A](a: List[Option[A]]): Option[List[A]] =
+    traverse(a)(_ => _)
 
   def traverse[A, B](as: List[A])(f: A => Option[B]): Option[List[B]] = as.foldLeft[Option[List[B]]](Some(Nil))((acc, a) => map2(f(a), acc)((b, bs) => bs.::(b)))
 }
